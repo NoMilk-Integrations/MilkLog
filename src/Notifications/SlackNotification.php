@@ -91,8 +91,9 @@ class SlackNotification extends Notification
     protected function getTitelForLevel(): string
     {
         return match ($this->level) {
-            'alert' => 'Advarsel!',
+            'alert' => 'Alarm!',
             'error' => 'Fejl!',
+            'warning' => 'Advarsel!',
             default => 'Information',
         };
     }
@@ -100,8 +101,9 @@ class SlackNotification extends Notification
     protected function getEmojiForLevel(): string
     {
         return match ($this->level) {
-            'alert' => ':red_circle:',
-            'error' => ':large_orange_circle:',
+            'alert' => ':rotating_light:',
+            'error' => ':red_circle:',
+            'warning' => ':large_orange_circle:',
             default => ':large_blue_circle:',
         };
     }

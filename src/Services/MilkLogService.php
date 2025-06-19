@@ -33,6 +33,11 @@ class MilkLogService implements MilkLogInterface
     {
         return $this->log('error', $message, $context);
     }
+
+    public function warning(string $message, array $context = []): self
+    {
+        return $this->log('warning', $message, $context);
+    }
     public function info(string $message, array $context = []): self
     {
         return $this->log('info', $message, $context);

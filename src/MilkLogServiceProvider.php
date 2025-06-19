@@ -14,7 +14,6 @@ class MilkLogServiceProvider extends ServiceProvider
             'milklog'
         );
 
-        // Bridge MilkLog Slack configuration to Laravel's Slack notification channel configuration
         $this->app->booted(function () {
             if (! config('services.slack.notifications.bot_user_oauth_token')) {
                 config([

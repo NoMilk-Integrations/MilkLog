@@ -6,6 +6,7 @@ interface MilkLogInterface
 {
     public function alert(string $message, array $context = []): self;
     public function error(string $message, array $context = []): self;
+    public function warning(string $message, array $context = []): self;
     public function info(string $message, array $context = []): self;
 
     public function channel(string $channel): self;

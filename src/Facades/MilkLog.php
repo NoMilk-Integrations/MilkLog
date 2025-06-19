@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \RootAccessPlease\MilkLog\Services\MilkLogService title(?string $message = null)
  * @method static \RootAccessPlease\MilkLog\Services\MilkLogService alert(string $message, array $context = [])
  * @method static \RootAccessPlease\MilkLog\Services\MilkLogService error(string $message, array $context = [])
+ * @method static \RootAccessPlease\MilkLog\Services\MilkLogService warning(string $message, array $context = [])
  * @method static \RootAccessPlease\MilkLog\Services\MilkLogService info(string $message, array $context = [])
  * @method static \RootAccessPlease\MilkLog\Services\MilkLogService channel(string $channel)
  * @method static \RootAccessPlease\MilkLog\Services\MilkLogService tags(array $tags)
