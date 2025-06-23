@@ -12,7 +12,7 @@ class MilkLogService implements MilkLogInterface
     protected ?string $title = null;
     protected string $level = '';
     protected string $message = '';
-    protected array $context = [];
+    protected array $properties = [];
     protected ?string $slackChannel = null;
     protected array $slackTags = [];
     protected ?string $logChannel = null;
@@ -24,23 +24,23 @@ class MilkLogService implements MilkLogInterface
         return $this;
     }
 
-    public function alert(string $message, array $context = []): self
+    public function alert(string $message): self
     {
-        return $this->log('alert', $message, $context);
+        return $this->log('alert', $message);
     }
 
-    public function error(string $message, array $context = []): self
+    public function error(string $message): self
     {
-        return $this->log('error', $message, $context);
+        return $this->log('error', $message);
     }
 
-    public function warning(string $message, array $context = []): self
+    public function warning(string $message): self
     {
-        return $this->log('warning', $message, $context);
+        return $this->log('warning', $message);
     }
-    public function info(string $message, array $context = []): self
+    public function info(string $message): self
     {
-        return $this->log('info', $message, $context);
+        return $this->log('info', $message);
     }
 
     public function channel(string $channel): self
@@ -53,6 +53,13 @@ class MilkLogService implements MilkLogInterface
     public function tags(array $tags): self
     {
         $this->slackTags = $tags;
+
+        return $this;
+    }
+
+    public function properties(array $properties): self
+    {
+        $this->properties = $properties;
 
         return $this;
     }
@@ -71,11 +78,10 @@ class MilkLogService implements MilkLogInterface
         $this->reset();
     }
 
-    protected function log(string $level, string $message, array $context = []): self
+    protected function log(string $level, string $message): self
     {
         $this->level = $level;
         $this->message = $message;
-        $this->context = $context;
 
         return $this;
     }
@@ -90,9 +96,7 @@ class MilkLogService implements MilkLogInterface
             ? Log::channel($this->logChannel)
             : Log::channel(config('milklog.logging.channel'));
 
-        $context = $this->buildLogContext();
-
-        $logger->{$this->level}($this->message, $context);
+        $logger->{$this->level}($this->message);
     }
 
     protected function sendSlackNotification(): void
@@ -105,7 +109,7 @@ class MilkLogService implements MilkLogInterface
             $this->title,
             $this->level,
             $this->message,
-            $this->context,
+            $this->properties,
             $this->getSlackOptions()
         );
 
@@ -129,31 +133,11 @@ class MilkLogService implements MilkLogInterface
         ];
     }
 
-    protected function buildLogContext(): array
-    {
-        $context = $this->context;
-
-        if (config('milklog.logging.include_context', true)) {
-            $context['milklog'] = [
-                'timestamp' => now()->toISOString(),
-                'level' => $this->level,
-                'slack_channel' => $this->slackChannel ?? config('milklog.slack.channel'),
-                'tags' => ! empty($this->slackTags) ? $this->slackTags : config('milklog.slack.tags', []),
-            ];
-        }
-
-        if (config('milklog.logging.include_trace', false) && in_array($this->level, ['error', 'alert'])) {
-            $context['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        }
-
-        return $context;
-    }
-
     protected function reset(): void
     {
         $this->level = '';
         $this->message = '';
-        $this->context = [];
+        $this->properties = [];
         $this->slackChannel = null;
         $this->slackTags = [];
         $this->logChannel = null;

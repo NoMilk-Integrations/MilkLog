@@ -12,20 +12,20 @@ class SlackNotification extends Notification
     protected ?string $title = null;
     protected string $level;
     protected string $message;
-    protected array $context;
+    protected array $properties;
     protected array $slackOptions;
 
     public function __construct(
         ?string $title,
         string $level,
         string $message,
-        array $context = [],
+        array $properties = [],
         array $slackOptions = []
     ) {
         $this->title = $title;
         $this->level = $level;
         $this->message = $message;
-        $this->context = $context;
+        $this->properties = $properties;
         $this->slackOptions = $slackOptions;
     }
 
@@ -53,34 +53,27 @@ class SlackNotification extends Notification
 
     protected function buildFieldsForSection(): array
     {
-        $fields = [
-            ['title' => 'Environment', 'value' => app()->environment()],
-            ['title' => 'Application', 'value' => config('app.name')],
-        ];
+        $sectionFields = [];
 
-        $extra = Arr::except($this->context, ['milklog', 'trace']);
-
-        if ($extra) {
-            $fields[] = [
-                'title' => 'Context',
-                'value' => $this->formatContext($extra),
+        foreach ($this->properties as $key => $value) {
+            $sectionFields[] = [
+                'title' => $key,
+                'value' => $value
             ];
         }
 
-        return $fields;
+        return array_merge(
+            $sectionFields,
+            $this->getEnvironmentFields()
+        );
     }
 
-    protected function formatContext(array $context): string
+    protected function getEnvironmentFields(): array
     {
-        $lines = [];
-
-        foreach ($context as $key => $value) {
-            $lines[] = is_array($value) || is_object($value)
-                ? "*{$key}*: ```".json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."```"
-                : "*{$key}*: {$value}";
-        }
-
-        return implode("\n", $lines);
+        return [
+            ['title' => 'Environment', 'value' => app()->environment()],
+            ['title' => 'Application', 'value' => config('app.name')],
+        ];
     }
 
     protected function getTitle(): string
